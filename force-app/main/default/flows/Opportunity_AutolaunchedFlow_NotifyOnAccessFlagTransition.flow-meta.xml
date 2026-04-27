@@ -463,7 +463,7 @@ Timestamp: </stringValue>
             <field>DeveloperName</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>Opportunity_Owner_Alerts</stringValue>
+                <stringValue>Opportunity_Confidentiality_Alerts</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>

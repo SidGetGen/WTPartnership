@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customNotifTypeName
+  >Opportunity Confidentiality Alerts</customNotifTypeName>
+    <description
+  >Sent by automation when an Opportunity confidentiality flag (Restricted or Top Secret) is enabled or disabled. Notifies the relevant Public Group members of the access classification change.</description>
+    <desktop>true</desktop>
+    <masterLabel>Opportunity Confidentiality Alerts</masterLabel>
+    <mobile>false</mobile>
+    <slack>false</slack>
+</CustomNotificationType>
