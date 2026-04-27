@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <actionCalls>
+        <description
+    >Resolves in-app notification recipient IDs and email addresses by querying the appropriate Public Group based on the Opportunity's access classification.</description>
+        <name>Resolve_Notification_Recipients</name>
+        <label>Resolve Notification Recipients</label>
+        <locationX>50</locationX>
+        <locationY>468</locationY>
+        <actionName>OpportunityEmailRouter</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>ASG_ComposeNotification</targetReference>
+        </connector>
+        <inputParameters>
+            <name>isRestricted</name>
+            <value>
+                <elementReference>$Record.Restricted__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>isTopSecret</name>
+            <value>
+                <elementReference>$Record.Top_Secret__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ownerEmail</name>
+            <value>
+                <elementReference>$Record.Owner.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ownerId</name>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputParameters>
+        <outputParameters>
+            <assignToReference>varT_recipientIds</assignToReference>
+            <name>recipientIds</name>
+        </outputParameters>
+        <outputParameters>
+            <assignToReference>varT_emailAddresses</assignToReference>
+            <name>emailAddresses</name>
+        </outputParameters>
+    </actionCalls>
+    <actionCalls>
+        <description
+    >Sends a custom in-app notification to all recipients resolved by OpportunityEmailRouter, linking to the current Opportunity record.</description>
+        <name>Send_Custom_Notification</name>
+        <label>Send Custom Notification</label>
+        <locationX>50</locationX>
+        <locationY>684</locationY>
+        <actionName>customNotificationAction</actionName>
+        <actionType>customNotificationAction</actionType>
+        <connector>
+            <targetReference>Send_Email</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>customNotifTypeId</name>
+            <value>
+                <elementReference
+        >Get_Custom_Notification_Type.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientIds</name>
+            <value>
+                <elementReference>varT_recipientIds</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>title</name>
+            <value>
+                <elementReference>varT_notifTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>body</name>
+            <value>
+                <elementReference>varT_notifBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>targetId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>customNotificationAction</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <actionCalls>
+        <description
+    >Sends an email alert with the bid deadline reminder content. Recipients resolved by OpportunityEmailRouter. The email is saved as an activity on the Opportunity.</description>
+        <name>Send_Email</name>
+        <label>Send Email</label>
+        <locationX>50</locationX>
+        <locationY>792</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>varT_emailAddresses</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>varT_notifTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>varT_notifBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>logEmailOnSend</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <assignments>
+        <description
+    >Resolves the varTT_NotificationTitle and varTT_NotificationBody text templates into the varT_notifTitle and varT_notifBody string variables consumed by the notification and email actions.</description>
+        <name>ASG_ComposeNotification</name>
+        <label>ASG ComposeNotification</label>
+        <locationX>50</locationX>
+        <locationY>576</locationY>
+        <assignmentItems>
+            <assignToReference>varT_notifTitle</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varTT_NotificationTitle</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varT_notifBody</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varTT_NotificationBody</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Send_Custom_Notification</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description
+    >Evaluates whether the current Opportunity falls within the bid deadline reminder window.</description>
+        <name>DEC_IsWithinReminderWindow</name>
+        <label>DEC IsWithinReminderWindow</label>
+        <locationX>182</locationX>
+        <locationY>252</locationY>
+        <defaultConnectorLabel
+    >Outside Window — Do Nothing</defaultConnectorLabel>
+        <rules>
+            <name>WithinWindow</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fxN_DaysUntilClosing</leftValueReference>
+                <operator>GreaterThanOrEqualTo</operator>
+                <rightValue>
+                    <numberValue>0.0</numberValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>fxN_DaysUntilClosing</leftValueReference>
+                <operator>LessThanOrEqualTo</operator>
+                <rightValue>
+                    <elementReference>fxN_ReminderDays</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Custom_Notification_Type</targetReference>
+            </connector>
+            <label>Within Reminder Window</label>
+        </rules>
+    </decisions>
+    <description
+  >Scheduled daily flow that runs on all open Opportunities with a Tender Closing Date set. For each record it evaluates whether the closing date falls within the configured reminder window, resolves notification recipients from the appropriate Public Group, then sends a custom in-app notification and email.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description
+    >Calculates the number of whole calendar days remaining until the Opportunity Tender Closing Date.</description>
+        <name>fxN_DaysUntilClosing</name>
+        <dataType>Number</dataType>
+        <expression
+    >ROUND(DATETIMEVALUE(TEXT({!$Record.Tender_Closing_Date__c}) &amp; &quot; 00:00:00&quot;) - DATETIMEVALUE(TEXT({!$Flow.CurrentDate}) &amp; &quot; 00:00:00&quot;), 0)</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <description
+    >Reads the Bid_Deadline_Reminder_Days custom label and converts it to a number.</description>
+        <name>fxN_ReminderDays</name>
+        <dataType>Number</dataType>
+        <expression>VALUE({!$Label.Bid_Deadline_Reminder_Days})</expression>
+        <scale>0</scale>
+    </formulas>
+    <interviewLabel
+  >Opportunity - ScheduledFlow - NotifyBidDeadlineApproaching {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - ScheduledFlow - NotifyBidDeadlineApproaching</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description
+    >Retrieves the Opportunity_Owner_Alerts custom notification type record to obtain its Id for the Send Custom Notification action.</description>
+        <name>Get_Custom_Notification_Type</name>
+        <label>Get Custom Notification Type</label>
+        <locationX>50</locationX>
+        <locationY>360</locationY>
+        <assignNullValuesIfNoRecordsFound
+    >false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Resolve_Notification_Recipients</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity_Owner_Alerts</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>CustomNotificationType</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>DeveloperName</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>DEC_IsWithinReminderWindow</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Tender_Closing_Date__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsClosed</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <schedule>
+            <dayOfMonthToRun>0</dayOfMonthToRun>
+            <frequency>Daily</frequency>
+            <frequencyNumber>0</frequencyNumber>
+            <startDate>2026-04-22</startDate>
+            <startTime>08:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <description
+    >Body content for the notification and email alert.</description>
+        <name>varTT_NotificationBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Opportunity Name: {!$Record.Name}
+Tender Closing Date: {!$Record.Tender_Closing_Date__c}
+Days Remaining: {!fxN_DaysUntilClosing}
+Amount: {!$Record.Amount}
+Account Name: {!$Record.Account.Name}
+
+Reminder generated at: {!$Flow.CurrentDateTime}</text>
+    </textTemplates>
+    <textTemplates>
+        <description
+    >Title for the notification and subject line for the email alert.</description>
+        <name>varTT_NotificationTitle</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Bid Deadline Approaching: {!$Record.Name}</text>
+    </textTemplates>
+    <variables>
+        <description
+    >Comma-separated email address string returned by OpportunityEmailRouter.</description>
+        <name>varT_emailAddresses</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Resolved notification body string.</description>
+        <name>varT_notifBody</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Resolved notification title string.</description>
+        <name>varT_notifTitle</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description
+    >Collection of Salesforce User IDs returned by OpportunityEmailRouter. Passed to the Send Custom Notification action.</description>
+        <name>varT_recipientIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description
+  >Subflow called from the Opportunity record-triggered flow. Updates LastStageChangeDate__c to today's date when the Opportunity stage changes.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description
+    >Returns today's date. Used to stamp LastStageChangeDate__c on the Opportunity.</description>
+        <name>fxD_Today</name>
+        <dataType>Date</dataType>
+        <expression>TODAY()</expression>
+    </formulas>
+    <interviewLabel
+  >Opportunity - AutolaunchedFlow - UpdateLastStageChangeDate {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - AutolaunchedFlow - UpdateLastStageChangeDate</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <name>UPD_SetLastStageChangeDate</name>
+        <label>Set Last Stage Change Date</label>
+        <locationX>176</locationX>
+        <locationY>120</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varR_newOpportunity.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>LastStageChangeDate__c</field>
+            <value>
+                <elementReference>fxD_Today</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Opportunity</object>
+    </recordUpdates>
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>UPD_SetLastStageChangeDate</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description
+    >The new (after-change) version of the Opportunity record passed in from the parent record-triggered flow.</description>
+        <name>varR_newOpportunity</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Opportunity</objectType>
+    </variables>
+</Flow>

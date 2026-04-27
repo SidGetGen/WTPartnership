@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>VR_Opportunity_Mandatory_On_Create</fullName>
+    <active>true</active>
+    <description
+  >Server-side enforcement of mandatory fields on Opportunity creation (ISNEW), regardless of entry point (UI/API/import/quick actions).</description>
+    <errorConditionFormula>AND(
+  ISNEW(),
+  OR(
+    ISBLANK(AccountId),
+    ISBLANK(Name),
+    ISBLANK(Amount)
+  )
+)</errorConditionFormula>
+    <errorMessage
+  >Please complete all mandatory fields to create the Opportunity.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closed_Won_Required_Project_Fields</fullName>
+    <active>true</active>
+    <description
+  >Prevents an Opportunity from being saved as Closed Won if any of the required project fields are blank: Name, Account, Estimated Start Date, Estimated End Date, Service Line, or Project Classification.</description>
+    <errorConditionFormula>AND(
+  ISPICKVAL(StageName, &quot;Closed Won&quot;),
+  OR(
+    ISBLANK(Name),
+    ISBLANK(AccountId),
+    ISBLANK(Estimated_Start_Date__c),
+    ISBLANK(Estimated_End_Date__c),
+    ISBLANK(Service_Line__c),
+    ISBLANK(TEXT(Project_Classification__c))
+  )
+)</errorConditionFormula>
+    <errorMessage
+  >Before marking this Opportunity as Closed Won, please complete all required project fields: Name, Account, Estimated Start Date, Estimated End Date, Service Line, and Project Classification.</errorMessage>
+</ValidationRule>

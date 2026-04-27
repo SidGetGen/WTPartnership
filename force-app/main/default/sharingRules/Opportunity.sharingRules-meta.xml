@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Normal_Opp_Share_SalesTeam_All</fullName>
+        <accessLevel>Read</accessLevel>
+        <description
+    >Shares normal (non-sensitive) Opportunities with all sales team members. Automatically revoked when Restricted__c or Top_Secret__c becomes true.</description>
+        <label>Normal Opp — Share with All Team</label>
+        <sharedTo>
+            <group>SalesTeam_All</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>Restricted__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Top_Secret__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <booleanFilter>1 AND 2</booleanFilter>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Restricted_Opp_Share_SalesTeam_Restricted</fullName>
+        <accessLevel>Read</accessLevel>
+        <description
+    >Shares Restricted Opportunities with the Restricted team (which includes Top Secret members via group nesting). Applies only when Restricted__c is true and Top_Secret__c is false.</description>
+        <label>Restricted Opp — Share with Restricted Team</label>
+        <sharedTo>
+            <group>SalesTeam_Restricted</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>Restricted__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </criteriaItems>
+        <criteriaItems>
+            <field>Top_Secret__c</field>
+            <operation>equals</operation>
+            <value>False</value>
+        </criteriaItems>
+        <booleanFilter>1 AND 2</booleanFilter>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>TopSecret_Opp_Share_SalesTeam_TopSecret</fullName>
+        <accessLevel>Read</accessLevel>
+        <description
+    >Shares Top Secret Opportunities exclusively with Top Secret team members. Applies whenever Top_Secret__c is true, regardless of Restricted__c.</description>
+        <label>Top Secret Opp — Share with Top Secret Team</label>
+        <sharedTo>
+            <group>SalesTeam_TopSecret</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>Top_Secret__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </criteriaItems>
+        <booleanFilter>1</booleanFilter>
+    </sharingCriteriaRules>
+</SharingRules>

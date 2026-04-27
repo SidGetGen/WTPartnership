@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Proposal/Bid Stage</fullName>
+        <closed>false</closed>
+        <converted>false</converted>
+        <forecastCategory>Pipeline</forecastCategory>
+        <highPriority>false</highPriority>
+        <probability>40</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Submitted</fullName>
+        <closed>false</closed>
+        <converted>false</converted>
+        <forecastCategory>Pipeline</forecastCategory>
+        <highPriority>false</highPriority>
+        <probability>50</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>On Hold</fullName>
+        <closed>false</closed>
+        <converted>false</converted>
+        <forecastCategory>Omitted</forecastCategory>
+        <highPriority>false</highPriority>
+        <probability>0</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Closed Won</fullName>
+        <closed>true</closed>
+        <converted>false</converted>
+        <forecastCategory>Closed</forecastCategory>
+        <highPriority>false</highPriority>
+        <probability>100</probability>
+        <won>true</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Closed Lost</fullName>
+        <closed>true</closed>
+        <converted>false</converted>
+        <forecastCategory>Omitted</forecastCategory>
+        <highPriority>false</highPriority>
+        <probability>0</probability>
+        <won>false</won>
+    </standardValue>
+</StandardValueSet>

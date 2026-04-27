@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description
+    >Branches on whether the Opportunity was just created (Insert) or updated. Insert events terminate here; updates proceed to the stage-change criteria check.</description>
+        <name>Check_Flow_Trigger_Action</name>
+        <label>Check Flow Trigger Action</label>
+        <locationX>176</locationX>
+        <locationY>120</locationY>
+        <defaultConnector>
+            <targetReference>DEC_StageChanged</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Update</defaultConnectorLabel>
+        <rules>
+            <name>Insert</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fxB_isNew</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>Insert</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description
+    >Checks whether StageName changed during this update. A positive match stamps LastStageChangeDate__c with today's date before any further processing.</description>
+        <name>DEC_StageChanged</name>
+        <label>Stage Changed</label>
+        <locationX>176</locationX>
+        <locationY>240</locationY>
+        <defaultConnector>
+            <targetReference>Check_Stage_Change_Notifications</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Stage Not Changed</defaultConnectorLabel>
+        <rules>
+            <name>Stage_Changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference
+        >Invoke_Last_Stage_Change_Date_Flow</targetReference>
+            </connector>
+            <label>Stage Changed</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description
+    >Evaluates whether the Opportunity StageName changed during this update AND the new stage is one of the key notification stages (Submitted, Closed Won, or Closed Lost). Only a match invokes the notification subflow.</description>
+        <name>Check_Stage_Change_Notifications</name>
+        <label>Check Stage Change Notifications</label>
+        <locationX>176</locationX>
+        <locationY>480</locationY>
+        <defaultConnector>
+            <targetReference>DEC_CheckAccessFlagChanges</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Skip</defaultConnectorLabel>
+        <rules>
+            <name>Stage_is_Submitted_Won_or_Lost</name>
+            <conditionLogic>1 AND (2 OR 3 OR 4)</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Submitted</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed Won</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed Lost</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference
+        >Invoke_Stage_Notification_Flow</targetReference>
+            </connector>
+            <label>Stage is Submitted, Won, or Lost</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description
+    >Evaluates whether Restricted__c or Top_Secret__c changed value during this update (in either direction). Invokes the access flag notification subflow so the appropriate group is notified whether the flag was turned on or off.</description>
+        <name>DEC_CheckAccessFlagChanges</name>
+        <label>Check Access Flag Changes</label>
+        <locationX>176</locationX>
+        <locationY>600</locationY>
+        <defaultConnectorLabel>No Flag Change — Exit</defaultConnectorLabel>
+        <rules>
+            <name>Access_Flag_Changed</name>
+            <conditionLogic>1 OR 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Restricted__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Top_Secret__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference
+        >Invoke_Access_Flag_Notification_Flow</targetReference>
+            </connector>
+            <label>Access Flag Changed</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description
+    >Checks whether the stage that just changed is specifically Closed Won. A positive match invokes the project orchestrator; all other key-stage transitions (Submitted, Closed Lost) skip directly to the access flag check.</description>
+        <name>DEC_IsClosedWon</name>
+        <label>Is Closed Won</label>
+        <locationX>176</locationX>
+        <locationY>720</locationY>
+        <defaultConnector>
+            <targetReference>DEC_CheckAccessFlagChanges</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Not Closed Won</defaultConnectorLabel>
+        <rules>
+            <name>Is_Closed_Won</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed Won</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Invoke_Project_Orchestrator</targetReference>
+            </connector>
+            <label>Is Closed Won</label>
+        </rules>
+    </decisions>
+    <description
+  >After-save record-triggered flow on Opportunity. Separates insert from update events, then invokes the autolaunched notification subflow when the stage transitions to a key stage (Submitted, Closed Won, or Closed Lost).</description>
+    <formulas>
+        <description
+    >Returns true when the triggering DML event is a new Opportunity insert; false on updates. Used by Check_Flow_Trigger_Action to branch insert vs. update paths.</description>
+        <name>fxB_isNew</name>
+        <dataType>Boolean</dataType>
+        <expression>ISNEW()</expression>
+    </formulas>
+    <interviewLabel
+  >Opportunity - RecordTriggeredFlow - AfterSave {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - RecordTriggeredFlow - AfterSave</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Flow_Trigger_Action</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <actionCalls>
+        <description
+    >Invokes the project orchestrator Apex class to create a PSA Project from the Closed Won Opportunity and copy all related Tasks and Events to the new Project.</description>
+        <name>Invoke_Project_Orchestrator</name>
+        <label>Invoke Project Orchestrator</label>
+        <locationX>176</locationX>
+        <locationY>840</locationY>
+        <actionName>OppClosedWonProjectOrchestrator</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>DEC_CheckAccessFlagChanges</targetReference>
+        </connector>
+        <inputParameters>
+            <name>opportunityId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <subflows>
+        <description
+    >Invokes the autolaunched subflow that stamps LastStageChangeDate__c with today's date on the Opportunity whose stage just changed.</description>
+        <name>Invoke_Last_Stage_Change_Date_Flow</name>
+        <label>Invoke Last Stage Change Date Flow</label>
+        <locationX>176</locationX>
+        <locationY>360</locationY>
+        <connector>
+            <targetReference>Check_Stage_Change_Notifications</targetReference>
+        </connector>
+        <flowName
+    >Opportunity_AutolaunchedFlow_UpdateLastStageChangeDate</flowName>
+        <inputAssignments>
+            <name>varR_newOpportunity</name>
+            <value>
+                <elementReference>$Record</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description
+    >Invokes the access flag notification subflow, passing the current and prior Opportunity record versions so the subflow can detect which flag transitioned and send targeted in-app notifications to the appropriate sales team members.</description>
+        <name>Invoke_Access_Flag_Notification_Flow</name>
+        <label>Invoke Access Flag Notification Flow</label>
+        <locationX>176</locationX>
+        <locationY>720</locationY>
+        <flowName
+    >Opportunity_AutolaunchedFlow_NotifyOnAccessFlagTransition</flowName>
+        <inputAssignments>
+            <name>varR_newOpportunity</name>
+            <value>
+                <elementReference>$Record</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varR_oldOpportunity</name>
+            <value>
+                <elementReference>$Record__Prior</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+    <subflows>
+        <description
+    >Invokes the autolaunched notification subflow, passing the current and prior Opportunity record versions so the subflow can compose and deliver stage-change notifications and emails.</description>
+        <name>Invoke_Stage_Notification_Flow</name>
+        <label>Invoke Stage Notification Flow</label>
+        <locationX>176</locationX>
+        <locationY>600</locationY>
+        <connector>
+            <targetReference>DEC_IsClosedWon</targetReference>
+        </connector>
+        <flowName
+    >Opportunity_AutolaunchedFlow_NotifyOnKeyStageTransitions</flowName>
+        <inputAssignments>
+            <name>varR_newOpportunity</name>
+            <value>
+                <elementReference>$Record</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>varR_oldOpportunity</name>
+            <value>
+                <elementReference>$Record__Prior</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>

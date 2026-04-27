@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description
+    >Sends a custom in-app notification to the Opportunity Owner, linking to the stagnant Opportunity record.</description>
+        <name>Send_Custom_Notification</name>
+        <label>Send Custom Notification</label>
+        <locationX>176</locationX>
+        <locationY>840</locationY>
+        <actionName>customNotificationAction</actionName>
+        <actionType>customNotificationAction</actionType>
+        <connector>
+            <targetReference>Resolve_Email_Recipients</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>customNotifTypeId</name>
+            <value>
+                <elementReference
+        >Get_Custom_Notification_Type.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientIds</name>
+            <value>
+                <elementReference>varT_recipientIds</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>title</name>
+            <value>
+                <elementReference>varT_notifTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>body</name>
+            <value>
+                <elementReference>varT_notifBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>targetId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>customNotificationAction</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <actionCalls>
+        <description
+    >Resolves the email recipient list based on the Opportunity's access classification by querying the appropriate Public Group. Normal opps route to the owner only; Restricted and Top Secret opps route to the matching group members.</description>
+        <name>Resolve_Email_Recipients</name>
+        <label>Resolve Email Recipients</label>
+        <locationX>176</locationX>
+        <locationY>960</locationY>
+        <actionName>OpportunityEmailRouter</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Send_Email</targetReference>
+        </connector>
+        <inputParameters>
+            <name>isRestricted</name>
+            <value>
+                <elementReference>$Record.Restricted__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>isTopSecret</name>
+            <value>
+                <elementReference>$Record.Top_Secret__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ownerEmail</name>
+            <value>
+                <elementReference>$Record.Owner.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ownerId</name>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputParameters>
+        <outputParameters>
+            <assignToReference>varT_routedEmailAddresses</assignToReference>
+            <name>emailAddresses</name>
+        </outputParameters>
+    </actionCalls>
+    <actionCalls>
+        <description
+    >Sends a logged email alert with stagnation details. Recipients resolved by OpportunityEmailRouter based on the Opportunity's access classification. The email is saved as an activity on the Opportunity record.</description>
+        <name>Send_Email</name>
+        <label>Send Email</label>
+        <locationX>176</locationX>
+        <locationY>1080</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>varT_routedEmailAddresses</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>varT_notifTitle</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>varT_notifBody</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>logEmailOnSend</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description
+    >Initialises varT_recipientIds with the Opportunity OwnerId as a single-element collection, ready for the in-app notification action.</description>
+        <name>ASG_InitRecipient</name>
+        <label>ASG Init Recipient</label>
+        <locationX>176</locationX>
+        <locationY>600</locationY>
+        <assignmentItems>
+            <assignToReference>varT_recipientIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>ASG_ComposeNotification</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description
+    >Resolves the varTT_NotificationTitle and varTT_NotificationBody text templates into the varT_notifTitle and varT_notifBody string variables consumed by the notification and email actions.</description>
+        <name>ASG_ComposeNotification</name>
+        <label>ASG Compose Notification</label>
+        <locationX>176</locationX>
+        <locationY>720</locationY>
+        <assignmentItems>
+            <assignToReference>varT_notifTitle</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varTT_NotificationTitle</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>varT_notifBody</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varTT_NotificationBody</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Send_Custom_Notification</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description
+    >Checks whether a stagnation threshold record exists in custom metadata for the Opportunity current stage. If no threshold is configured for this stage the record is skipped without sending any notifications.</description>
+        <name>DEC_ThresholdConfigured</name>
+        <label>Threshold Configured For Stage</label>
+        <locationX>176</locationX>
+        <locationY>240</locationY>
+        <defaultConnectorLabel>No Threshold — Skip</defaultConnectorLabel>
+        <rules>
+            <name>Threshold_Found</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference
+        >Get_Stagnation_Threshold.Threshold_Days__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>DEC_IsStagnant</targetReference>
+            </connector>
+            <label>Threshold Found</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description
+    >Evaluates whether the Opportunity has been in its current stage for at least as many days as the configured threshold. Records below the threshold exit without generating notifications.</description>
+        <name>DEC_IsStagnant</name>
+        <label>Stage Is Stagnant</label>
+        <locationX>176</locationX>
+        <locationY>360</locationY>
+        <defaultConnectorLabel>Not Stagnant — Skip</defaultConnectorLabel>
+        <rules>
+            <name>Is_Stagnant</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fxN_DaysInStage</leftValueReference>
+                <operator>GreaterThanOrEqualTo</operator>
+                <rightValue>
+                    <elementReference
+          >Get_Stagnation_Threshold.Threshold_Days__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Custom_Notification_Type</targetReference>
+            </connector>
+            <label>Is Stagnant</label>
+        </rules>
+    </decisions>
+    <description
+  >Scheduled daily flow that processes all open Opportunities with a LastStageChangeDate__c populated. For each record it looks up the stagnation threshold from Opportunity_Stage_Stagnation_Threshold__mdt for the current stage, evaluates whether the Opportunity has exceeded that threshold, then sends a custom in-app notification to the owner and a logged email routed via OpportunityEmailRouter based on the Opportunity's access classification.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description
+    >Calculates the number of whole calendar days the Opportunity has been in its current stage by subtracting LastStageChangeDate__c from today's date.</description>
+        <name>fxN_DaysInStage</name>
+        <dataType>Number</dataType>
+        <expression>TODAY() - {!$Record.LastStageChangeDate__c}</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <description
+    >Builds a Lightning Experience record URL for the Opportunity by appending the record Id to the org enterprise server base URL, producing a clickable deep link for the email body.</description>
+        <name>fxT_recordUrl</name>
+        <dataType>String</dataType>
+        <expression
+    >{!$Api.Enterprise_Server_URL_580} &amp; &quot;/&quot; &amp; {!$Record.Id}</expression>
+    </formulas>
+    <interviewLabel
+  >Opportunity - ScheduledFlow - NotifyStageStagnation {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - ScheduledFlow - NotifyStageStagnation</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description
+    >Retrieves the Opportunity_Owner_Alerts custom notification type record to obtain its Id for the Send Custom Notification action.</description>
+        <name>Get_Custom_Notification_Type</name>
+        <label>Get Custom Notification Type</label>
+        <locationX>176</locationX>
+        <locationY>480</locationY>
+        <assignNullValuesIfNoRecordsFound
+    >false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>ASG_InitRecipient</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity_Owner_Alerts</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>CustomNotificationType</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>DeveloperName</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description
+    >Retrieves the Opportunity_Stage_Stagnation_Threshold__mdt record matching the Opportunity current StageName. Sets the result to null if no threshold is configured for this stage, causing DEC_ThresholdConfigured to skip notification.</description>
+        <name>Get_Stagnation_Threshold</name>
+        <label>Get Stagnation Threshold</label>
+        <locationX>176</locationX>
+        <locationY>120</locationY>
+        <assignNullValuesIfNoRecordsFound
+    >true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>DEC_ThresholdConfigured</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Stage_Name__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.StageName</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity_Stage_Stagnation_Threshold__mdt</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Stage_Name__c</queriedFields>
+        <queriedFields>Threshold_Days__c</queriedFields>
+        <queriedFields>Suggested_Next_Actions__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Stagnation_Threshold</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>LastStageChangeDate__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsClosed</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <schedule>
+            <dayOfMonthToRun>0</dayOfMonthToRun>
+            <frequency>Daily</frequency>
+            <frequencyNumber>0</frequencyNumber>
+            <startDate>2026-04-26</startDate>
+            <startTime>08:00:00.000Z</startTime>
+        </schedule>
+        <triggerType>Scheduled</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <description
+    >Body content for the stagnation in-app notification and email. Includes stage, days in stage versus threshold, key Opportunity fields, suggested next actions from the CMT record, and a direct record link.</description>
+        <name>varTT_NotificationBody</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Opportunity Name: {!$Record.Name}
+Account: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+Days in Current Stage: {!fxN_DaysInStage} days (Threshold: {!Get_Stagnation_Threshold.Threshold_Days__c} days)
+Amount: {!$Record.Amount}
+Close Date: {!$Record.CloseDate}
+
+Suggested Next Actions:
+{!Get_Stagnation_Threshold.Suggested_Next_Actions__c}
+
+Record Link: {!fxT_recordUrl}
+
+Alert generated at: {!$Flow.CurrentDateTime}</text>
+    </textTemplates>
+    <textTemplates>
+        <description
+    >Title for the stagnation in-app notification and subject line for the email alert. Surfaces the Opportunity name and current stage so the owner immediately identifies the affected record.</description>
+        <name>varTT_NotificationTitle</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text
+    >Stage Stagnation Alert: {!$Record.Name} — {!$Record.StageName}</text>
+    </textTemplates>
+    <variables>
+        <description
+    >Resolved notification body string, assigned from varTT_NotificationBody by ASG_ComposeNotification and passed to both the custom notification and email actions.</description>
+        <name>varT_notifBody</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description
+    >Resolved notification title string, assigned from varTT_NotificationTitle by ASG_ComposeNotification and passed to both the custom notification and email actions.</description>
+        <name>varT_notifTitle</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description
+    >Single-element Text collection containing the Opportunity OwnerId. Passed to the Send Custom Notification action as the target recipient list.</description>
+        <name>varT_recipientIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description
+    >Comma-separated email address string returned by OpportunityEmailRouter. Owner email for normal Opportunities; group members' emails for Restricted and Top Secret Opportunities.</description>
+        <name>varT_routedEmailAddresses</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>
