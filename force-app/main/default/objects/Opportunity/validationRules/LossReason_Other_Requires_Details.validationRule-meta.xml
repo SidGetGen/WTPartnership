@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LossReason_Other_Requires_Details</fullName>
+    <active>true</active>
+    <description
+  >When Loss Reason is set to Other, Loss Reason Details must be provided to explain the specific reason.</description>
+    <errorConditionFormula>AND(
+  ISPICKVAL(StageName, &quot;Closed Lost&quot;),
+  ISPICKVAL(Loss_Reason__c, &quot;Other&quot;),
+  ISBLANK(Loss_Reason_Details__c)
+)</errorConditionFormula>
+    <errorDisplayField>Loss_Reason_Details__c</errorDisplayField>
+    <errorMessage
+  >Loss Reason Details is required when Loss Reason is Other. Please provide a specific explanation.</errorMessage>
+</ValidationRule>
