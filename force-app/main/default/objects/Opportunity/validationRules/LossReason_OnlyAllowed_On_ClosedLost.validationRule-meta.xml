@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LossReason_OnlyAllowed_On_ClosedLost</fullName>
+    <active>true</active>
+    <description
+  >Prevents Loss Reason from being populated on any stage other than Closed Lost.</description>
+    <errorConditionFormula>AND(
+  NOT(ISPICKVAL(StageName, &quot;Closed Lost&quot;)),
+  NOT(ISBLANK(TEXT(Loss_Reason__c)))
+)</errorConditionFormula>
+    <errorDisplayField>Loss_Reason__c</errorDisplayField>
+    <errorMessage
+  >Loss Reason can only be set when the stage is Closed Lost.</errorMessage>
+</ValidationRule>

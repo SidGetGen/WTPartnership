@@ -11,5 +11,5 @@
 )</errorConditionFormula>
     <errorDisplayField>Loss_Reason_Details__c</errorDisplayField>
     <errorMessage
-  >Loss Reason Details is required when Loss Reason is Other. Please provide a specific explanation.</errorMessage>
+  >Loss Reason Details is required when Loss Reason is Other. Please provide a specific explanation for the loss.</errorMessage>
 </ValidationRule>
