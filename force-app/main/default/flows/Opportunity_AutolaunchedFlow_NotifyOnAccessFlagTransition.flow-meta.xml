@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>62.0</apiVersion>
-    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <actionCalls>
         <description
     >Resolves recipient IDs and email addresses from the appropriate Public Group based on which access flag(s) transitioned. varB_notifyRestricted and varB_notifyTopSecret drive the routing so only the groups relevant to the flag change are queried.</description>
         <name>Resolve_Notification_Recipients</name>
         <label>Resolve Notification Recipients</label>
         <locationX>50</locationX>
-        <locationY>842</locationY>
+        <locationY>950</locationY>
         <actionName>OpportunityEmailRouter</actionName>
         <actionType>apex</actionType>
         <connector>
             <targetReference>Assign_Notification_Content</targetReference>
         </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>isRestricted</name>
             <value>
@@ -39,6 +38,8 @@
                 <elementReference>varR_newOpportunity.OwnerId</elementReference>
             </value>
         </inputParameters>
+        <nameSegment>OpportunityEmailRouter</nameSegment>
+        <offset>0</offset>
         <outputParameters>
             <assignToReference>varT_recipientIds</assignToReference>
             <name>recipientIds</name>
@@ -54,7 +55,7 @@
         <name>Send_Custom_Notification</name>
         <label>Send Custom Notification</label>
         <locationX>50</locationX>
-        <locationY>1058</locationY>
+        <locationY>1166</locationY>
         <actionName>customNotificationAction</actionName>
         <actionType>customNotificationAction</actionType>
         <connector>
@@ -101,7 +102,7 @@
         <name>Send_Email</name>
         <label>Send Email</label>
         <locationX>50</locationX>
-        <locationY>1166</locationY>
+        <locationY>1274</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
@@ -109,6 +110,20 @@
             <name>emailAddresses</name>
             <value>
                 <elementReference>varT_emailAddresses</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderType</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OrgWideEmailAddress</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>senderAddress</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>polaris@wtpartnership.com.au</stringValue>
             </value>
         </inputParameters>
         <inputParameters>
@@ -139,49 +154,15 @@
         <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
     </actionCalls>
-    <assignments>
-        <description
-    >Marks that the Restricted__c flag changed, so OpportunityEmailRouter will query SalesTeam_Restricted.</description>
-        <name>SET_NotifyRestricted</name>
-        <label>SET NotifyRestricted</label>
-        <locationX>50</locationX>
-        <locationY>242</locationY>
-        <assignmentItems>
-            <assignToReference>varB_notifyRestricted</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>DEC_TopSecretChanged</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <description
-    >Marks that the Top_Secret__c flag changed, so OpportunityEmailRouter will query SalesTeam_TopSecret.</description>
-        <name>SET_NotifyTopSecret</name>
-        <label>SET NotifyTopSecret</label>
-        <locationX>50</locationX>
-        <locationY>542</locationY>
-        <assignmentItems>
-            <assignToReference>varB_notifyTopSecret</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>DEC_ShouldNotify</targetReference>
-        </connector>
-    </assignments>
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
         <description
     >Composes varT_notificationTitle and varT_notificationBody from Opportunity field values and the record URL.</description>
         <name>Assign_Notification_Content</name>
         <label>Assign Notification Content</label>
         <locationX>50</locationX>
-        <locationY>950</locationY>
+        <locationY>1058</locationY>
         <assignmentItems>
             <assignToReference>varT_notificationTitle</assignToReference>
             <operator>Assign</operator>
@@ -274,6 +255,42 @@ Timestamp: </stringValue>
         </assignmentItems>
         <connector>
             <targetReference>Send_Custom_Notification</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description
+    >Marks that the Restricted__c flag changed, so OpportunityEmailRouter will query SalesTeam_Restricted.</description>
+        <name>SET_NotifyRestricted</name>
+        <label>SET NotifyRestricted</label>
+        <locationX>50</locationX>
+        <locationY>242</locationY>
+        <assignmentItems>
+            <assignToReference>varB_notifyRestricted</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>DEC_TopSecretChanged</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description
+    >Marks that the Top_Secret__c flag changed, so OpportunityEmailRouter will query SalesTeam_TopSecret.</description>
+        <name>SET_NotifyTopSecret</name>
+        <label>SET NotifyTopSecret</label>
+        <locationX>50</locationX>
+        <locationY>542</locationY>
+        <assignmentItems>
+            <assignToReference>varB_notifyTopSecret</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>DEC_ShouldNotify</targetReference>
         </connector>
     </assignments>
     <decisions>

@@ -128,6 +128,16 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
+                <fieldItem>Record.ExpectedRevenue</fieldItem>
+                <identifier>RecordExpectedRevenueField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
                 <fieldItem>Record.Weighted_Amount__c</fieldItem>
                 <identifier>RecordWeighted_Amount_cField</identifier>
             </fieldInstance>

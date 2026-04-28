@@ -22,6 +22,23 @@
  * unconditionally.
  */
 public inherited sharing class OppClosedWonProjectOrchestrator {
+  // Opportunity Service_Line__c (multi-select) → pse__Proj__c Service_Line__c (single-select)
+  private static final Map<String, String> SERVICE_LINE_MAP = new Map<String, String>{
+    'Asset & FM' => 'Asset & Facilities Management',
+    'Cost Management' => 'Cost Management & Quantity Surveying',
+    'Cost Engineering' => 'Cost Management & Quantity Surveying',
+    'Cost Engineering (Infra)' => 'Cost Management & Quantity Surveying',
+    'Cost Engineering M&E' => 'Cost Management & Quantity Surveying',
+    'Cost Planning' => 'Cost Management & Quantity Surveying',
+    'Quantity Surveying' => 'Cost Management & Quantity Surveying',
+    'Digital Services' => 'Digital Advisory',
+    'Digital Transformation' => 'Digital Advisory',
+    'P3 Advisory' => 'P3 & Project Delivery (US)',
+    'Portfolio & Program Advisory' => 'Portfolio & Program Advisory',
+    'Corporate Services' => 'Corporate Services',
+    'Project Management Services' => 'Project Management (India)'
+  };
+
   // ─── Invocable Request DTO ───────────────────────────────────────────────
 
   public class Request {
@@ -66,6 +83,7 @@ public inherited sharing class OppClosedWonProjectOrchestrator {
           Name,
           AccountId,
           OwnerId,
+          Project_Lead__c,
           Estimated_Start_Date__c,
           Estimated_End_Date__c,
           Service_Line__c,
@@ -90,10 +108,13 @@ public inherited sharing class OppClosedWonProjectOrchestrator {
       ]
     );
 
-    // ── 3. Collect owner User Ids for Contact resolution ─────────────────
+    // ── 3. Collect owner + project lead User Ids for Contact resolution ────
     Set<Id> ownerUserIds = new Set<Id>();
     for (Opportunity opp : oppById.values()) {
       ownerUserIds.add(opp.OwnerId);
+      if (opp.Project_Lead__c != null) {
+        ownerUserIds.add(opp.Project_Lead__c);
+      }
     }
 
     // ── 4. SOQL 2 — Contacts linked to owner Users ──────────────────────
@@ -121,13 +142,14 @@ public inherited sharing class OppClosedWonProjectOrchestrator {
       proj.Name = opp.Name;
       proj.pse__Account__c = opp.AccountId;
       proj.pse__Project_Manager__c = userIdToContactId.get(opp.OwnerId);
-      proj.A_Project_Lead__c = userIdToContactId.get(opp.OwnerId);
+      proj.A_Project_Lead__c = userIdToContactId.get(opp.Project_Lead__c);
       proj.pse__Start_Date__c = opp.Estimated_Start_Date__c;
       proj.pse__End_Date__c = opp.Estimated_End_Date__c;
       // Service_Line__c is multi-select on Opportunity but single-select on
-      // pse__Proj__c — take the first selected value only.
+      // pse__Proj__c, and the two picklists use different value sets — map
+      // the first selected Opportunity value; unmapped values become null.
       proj.Service_Line__c = String.isNotBlank(opp.Service_Line__c)
-        ? opp.Service_Line__c.split(';')[0]
+        ? SERVICE_LINE_MAP.get(opp.Service_Line__c.split(';')[0].trim())
         : null;
       proj.A_Project_Classification__c = opp.Project_Classification__c;
       proj.W_Project_Subclassification__c = opp.Project_Sub_classification__c;
