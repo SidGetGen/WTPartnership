@@ -152,6 +152,10 @@
             <outputField>Project_Sub_Sub_Classification__c</outputField>
         </mappingFields>
         <mappingFields>
+            <inputField>Sector__c</inputField>
+            <outputField>Sector__c</outputField>
+        </mappingFields>
+        <mappingFields>
             <inputField>Tender_Closing_Date__c</inputField>
             <outputField>Tender_Closing_Date__c</outputField>
         </mappingFields>

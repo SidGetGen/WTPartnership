@@ -360,63 +360,6 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Discovery_Completed__c</fieldItem>
-                <identifier>RecordDiscovery_Completed_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>required</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Reason_Discovery_Completed__c</fieldItem>
-                <identifier
-        >RecordReason_Discovery_Completed__cField</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.Discovery_Completed__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>No</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.ROI_Analysis_Completed__c</fieldItem>
-                <identifier>RecordROI_Analysis_Completed_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>required</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Reason_ROI_Analysis_Completed__c</fieldItem>
-                <identifier
-        >RecordReason_ROI_Analysis_Completed__cField</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue
-            >{!Record.ROI_Analysis_Completed__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>No</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
                 <fieldItem>Record.Decision_Maker_Identified__c</fieldItem>
                 <identifier>RecordDecision_Maker_Identified_cField</identifier>
             </fieldInstance>
@@ -435,33 +378,6 @@
                     <criteria>
                         <leftValue
             >{!Record.Decision_Maker_Identified__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>No</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Budget_Confirmed__c</fieldItem>
-                <identifier>RecordBudget_Confirmed_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>required</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Reason_Budget_Confirmed__c</fieldItem>
-                <identifier>RecordReason_Budget_Confirmed__cField</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.Budget_Confirmed__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>No</rightValue>
                     </criteria>
@@ -1783,6 +1699,36 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>parentFieldApiName</name>
+                    <value>Opportunity.Id</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListApiName</name>
+                    <value>Histories</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListComponentOverride</name>
+                    <value>NONE</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>rowsToDisplay</name>
+                    <value>10</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showActionBar</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentName>force:relatedListSingleContainer</componentName>
+                <identifier>force_relatedListSingleContainer</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-366e51f3-7626-44ce-bed3-b966134bf7db</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>body</name>
                     <value>detailTabContent</value>
                 </componentInstanceProperties>
@@ -1806,6 +1752,20 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>collaborateTab</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-366e51f3-7626-44ce-bed3-b966134bf7db</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Opportunity History</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab</identifier>
             </componentInstance>
         </itemInstances>
         <mode>Replace</mode>

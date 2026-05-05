@@ -3,18 +3,19 @@
     <fullName>Closed_Won_Required_Project_Fields</fullName>
     <active>true</active>
     <description
-  >Prevents an Opportunity from being saved as Closed Won if any of the required project fields are blank: Name, Account, Estimated Start Date, Estimated End Date, Service Line, or Project Classification.</description>
+  >Prevents an Opportunity from being saved as Closed Won if any of the required project fields are blank.</description>
     <errorConditionFormula>AND(
   ISPICKVAL(StageName, &quot;Closed Won&quot;),
   OR(
-    ISBLANK(Name),
-    ISBLANK(AccountId),
     ISBLANK(Estimated_Start_Date__c),
     ISBLANK(Estimated_End_Date__c),
     ISBLANK(Service_Line__c),
-    ISBLANK(TEXT(Project_Classification__c))
+    ISBLANK(TEXT(Project_Classification__c)),
+    ISBLANK(TEXT(Project_Sub_classification__c)),
+    ISBLANK(Amount),
+    ISBLANK(Estimated_Construction_Costs__c)
   )
 )</errorConditionFormula>
     <errorMessage
-  >Before marking this Opportunity as Closed Won, please complete all required project fields: Name, Account, Estimated Start Date, Estimated End Date, Service Line, and Project Classification.</errorMessage>
+  >Before marking this Opportunity as Closed Won, please complete all required project fields: Project Lead, Estimated Start Date, Estimated End Date, Service Line, Project Classification, Project Sub-Classification, Amount, and Estimated Construction Costs.</errorMessage>
 </ValidationRule>

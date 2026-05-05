@@ -36,6 +36,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.ExpectedRevenue</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.Loss_Reason__c</field>
         <readable>true</readable>
@@ -63,6 +68,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.Restricted__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.Sector__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

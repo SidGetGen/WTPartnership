@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Knowledge, no contact</fullName>
+        <default>true</default>
+        <label>Knowledge, no contact</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Warm lead</fullName>
+        <default>false</default>
+        <label>Warm lead</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Active lead connected</fullName>
+        <default>false</default>
+        <label>Active lead connected</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Active dialogue meeting</fullName>
+        <default>false</default>
+        <label>Active dialogue meeting</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Converted</fullName>
+        <default>false</default>
+        <label>Converted</label>
+        <converted>true</converted>
+    </standardValue>
+</StandardValueSet>

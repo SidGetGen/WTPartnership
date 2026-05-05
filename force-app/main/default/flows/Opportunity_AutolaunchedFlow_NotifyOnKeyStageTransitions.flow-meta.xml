@@ -46,10 +46,6 @@
             <assignToReference>varT_recipientIds</assignToReference>
             <name>recipientIds</name>
         </outputParameters>
-        <outputParameters>
-            <assignToReference>varT_emailAddresses</assignToReference>
-            <name>emailAddresses</name>
-        </outputParameters>
     </actionCalls>
     <actionCalls>
         <description
@@ -60,9 +56,6 @@
         <locationY>458</locationY>
         <actionName>customNotificationAction</actionName>
         <actionType>customNotificationAction</actionType>
-        <connector>
-            <targetReference>Send_Email</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>customNotifTypeId</name>
@@ -96,63 +89,6 @@
             </value>
         </inputParameters>
         <nameSegment>customNotificationAction</nameSegment>
-        <offset>0</offset>
-    </actionCalls>
-    <actionCalls>
-        <description
-    >Sends an email alert with stage change details. Recipients are resolved by OpportunityEmailRouter: owner only for normal Opportunities; group members for Restricted or Top Secret Opportunities.</description>
-        <name>Send_Email</name>
-        <label>Send Email</label>
-        <locationX>176</locationX>
-        <locationY>566</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>emailAddresses</name>
-            <value>
-                <elementReference>varT_emailAddresses</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>polaris@wtpartnership.com.au</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailSubject</name>
-            <value>
-                <elementReference>varT_emailSubject</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailBody</name>
-            <value>
-                <elementReference>varT_emailBody</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>varR_newOpportunity.Id</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>logEmailOnSend</name>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
@@ -272,58 +208,6 @@ Timestamp: </stringValue>
                 <elementReference>fxDT_nowFormatted</elementReference>
             </value>
         </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailSubject</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <stringValue>Stage change on Opportunity: </stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailSubject</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>varR_newOpportunity.Name</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailSubject</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <stringValue> → </stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailSubject</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference
-        >varR_newOpportunity.StageName</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailBody</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>varT_notificationBody</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailBody</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <stringValue>
-
-Record Link: </stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>varT_emailBody</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>fxT_recordUrl</elementReference>
-            </value>
-        </assignmentItems>
         <connector>
             <targetReference>Send_Custom_Notification</targetReference>
         </connector>
@@ -338,14 +222,7 @@ Record Link: </stringValue>
         <dataType>String</dataType>
         <expression>TEXT(NOW())</expression>
     </formulas>
-    <formulas>
-        <description
-    >Builds a Lightning Experience record URL for the Opportunity for the email body.</description>
-        <name>fxT_recordUrl</name>
-        <dataType>String</dataType>
-        <expression
-    >{!$Api.Enterprise_Server_URL_580} &amp; &quot;/&quot; &amp; {!varR_newOpportunity.Id}</expression>
-    </formulas>
+
     <interviewLabel
   >Opportunity - AutolaunchedFlow - NotifyOnKeyStageTransitions {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Opportunity - AutolaunchedFlow - NotifyOnKeyStageTransitions</label>
@@ -416,31 +293,7 @@ Record Link: </stringValue>
         <isOutput>false</isOutput>
         <objectType>Opportunity</objectType>
     </variables>
-    <variables>
-        <description
-    >Comma-separated email address string returned by OpportunityEmailRouter. Used by the emailSimple action.</description>
-        <name>varT_emailAddresses</name>
-        <dataType>String</dataType>
-        <isCollection>false</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-    </variables>
-    <variables>
-        <description>Body text of the email alert.</description>
-        <name>varT_emailBody</name>
-        <dataType>String</dataType>
-        <isCollection>false</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-    </variables>
-    <variables>
-        <description>Subject line of the email alert.</description>
-        <name>varT_emailSubject</name>
-        <dataType>String</dataType>
-        <isCollection>false</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-    </variables>
+
     <variables>
         <description>Body text of the custom in-app notification.</description>
         <name>varT_notificationBody</name>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description
+    >Sets CloseDate to 60 days from today and auto-formats the Opportunity Name as "Account Name - Type - CloseDate".</description>
+        <name>ASN_SetNameAndCloseDate</name>
+        <label>Set Name and Close Date</label>
+        <locationX>176</locationX>
+        <locationY>120</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.CloseDate</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>fxD_CloseDate</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>fxT_Name</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.StageName</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Proposal/Bid Stage</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description
+  >Before-save flow on Opportunity create. Sets CloseDate to today + 60 days and formats the Name as "Account Name - Opportunity Type - Close Date".</description>
+    <environments>Default</environments>
+    <formulas>
+        <description
+    >Today's date plus 60 days, used as the default Close Date on new Opportunities.</description>
+        <name>fxD_CloseDate</name>
+        <dataType>Date</dataType>
+        <expression>TODAY() + 60</expression>
+    </formulas>
+    <formulas>
+        <description
+    >Formatted Opportunity name: "Account Name - Type - YYYY-MM-DD". Blanks in Account Name or Type produce an empty segment.</description>
+        <name>fxT_Name</name>
+        <dataType>String</dataType>
+        <expression
+    >{!$Record.Account.Name} &amp; IF(ISBLANK(TEXT({!$Record.Type})), "", " - " &amp; TEXT({!$Record.Type})) &amp; " - " &amp; TEXT(TODAY() + 60)</expression>
+    </formulas>
+    <interviewLabel
+  >Opportunity - RecordTriggeredFlow - BeforeSave {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity - RecordTriggeredFlow - BeforeSave</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>ASN_SetNameAndCloseDate</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

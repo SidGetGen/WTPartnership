@@ -3,15 +3,12 @@
     <fullName>ClosedLost_Require_LossInfo</fullName>
     <active>true</active>
     <description
-  >Require Loss Reason and Loss Reason Details when StageName is Closed Lost.</description>
+  >Require Loss Reason when StageName is Closed Lost. Loss Reason Details is only required when Loss Reason is "Other" (enforced by a separate rule).</description>
     <errorConditionFormula>AND(
   ISPICKVAL(StageName, &quot;Closed Lost&quot;),
-  OR(
-     ISBLANK(TEXT(Loss_Reason__c)),
-     ISBLANK(Loss_Reason_Details__c)
-  )
+  ISBLANK(TEXT(Loss_Reason__c))
 )</errorConditionFormula>
-    <errorDisplayField>Loss_Reason_Details__c</errorDisplayField>
+    <errorDisplayField>Loss_Reason__c</errorDisplayField>
     <errorMessage
-  >When Stage is Closed Lost, populate Loss Reason and Loss Reason Details.</errorMessage>
+  >When Stage is Closed Lost, a Loss Reason must be selected.</errorMessage>
 </ValidationRule>

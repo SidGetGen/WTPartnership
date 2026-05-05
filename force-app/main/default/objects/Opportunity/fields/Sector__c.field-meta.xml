@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sector__c</fullName>
+    <label>Sector</label>
+    <description
+  >Industry sector classification for this opportunity. Used to categorize opportunities by the target market or industry vertical.</description>
+    <inlineHelpText
+  >Select the primary industry sector that best describes this opportunity. This helps with pipeline segmentation and reporting by market vertical.</inlineHelpText>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetName>Sector</valueSetName>
+    </valueSet>
+</CustomField>

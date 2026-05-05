@@ -44,10 +44,6 @@
             <assignToReference>varT_recipientIds</assignToReference>
             <name>recipientIds</name>
         </outputParameters>
-        <outputParameters>
-            <assignToReference>varT_emailAddresses</assignToReference>
-            <name>emailAddresses</name>
-        </outputParameters>
     </actionCalls>
     <actionCalls>
         <description
@@ -58,9 +54,6 @@
         <locationY>1166</locationY>
         <actionName>customNotificationAction</actionName>
         <actionType>customNotificationAction</actionType>
-        <connector>
-            <targetReference>Send_Email</targetReference>
-        </connector>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>customNotifTypeId</name>
@@ -94,64 +87,6 @@
             </value>
         </inputParameters>
         <nameSegment>customNotificationAction</nameSegment>
-        <offset>0</offset>
-    </actionCalls>
-    <actionCalls>
-        <description
-    >Sends an email alert to all eligible group members with access flag change details. The email is saved as an activity on the Opportunity.</description>
-        <name>Send_Email</name>
-        <label>Send Email</label>
-        <locationX>50</locationX>
-        <locationY>1274</locationY>
-        <actionName>emailSimple</actionName>
-        <actionType>emailSimple</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>emailAddresses</name>
-            <value>
-                <elementReference>varT_emailAddresses</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderType</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>OrgWideEmailAddress</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>senderAddress</name>
-            <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>polaris@wtpartnership.com.au</stringValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailSubject</name>
-            <value>
-                <elementReference>varT_notificationTitle</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailBody</name>
-            <value>
-                <elementReference>varT_notificationBody</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>relatedRecordId</name>
-            <value>
-                <elementReference>varR_newOpportunity.Id</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>logEmailOnSend</name>
-            <value>
-                <booleanValue>true</booleanValue>
-            </value>
-        </inputParameters>
-        <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
     </actionCalls>
     <apiVersion>62.0</apiVersion>
@@ -541,15 +476,7 @@ Timestamp: </stringValue>
         <isOutput>false</isOutput>
         <objectType>Opportunity</objectType>
     </variables>
-    <variables>
-        <description
-    >Comma-separated email address string returned by OpportunityEmailRouter.</description>
-        <name>varT_emailAddresses</name>
-        <dataType>String</dataType>
-        <isCollection>false</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-    </variables>
+
     <variables>
         <description>Body of the custom in-app notification.</description>
         <name>varT_notificationBody</name>
